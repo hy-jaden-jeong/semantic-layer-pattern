@@ -1,0 +1,5 @@
+metric,metric_label,path
+keyword_search,키워드 검색,/search
+category_browse,카테고리 탐색,/category
+category_browse,카테고리 탐색,/category/list
+filter_search,필터 검색,/search/filter

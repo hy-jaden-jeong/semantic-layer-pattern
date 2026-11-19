@@ -25,7 +25,7 @@ SKILLS_REPO=hy-jaden-jeong/semantic-layer-pattern   # skill 저장소 <org>/<rep
 SHOP_BI_URL=${SHOP_BI_URL:-https://github.com/$DEFS_REPO.git}
 SHOP_SKILLS_URL=${SHOP_SKILLS_URL:-}
 CACHE=${SHOP_BI_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/shop-data-analytics}
-SEM=src/bi/semantic
+SEM=semantic
 now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
 command -v timeout >/dev/null || timeout() { shift; "$@"; }   # macOS 기본에 timeout이 없을 때
 quiet_fetch() { GIT_TERMINAL_PROMPT=0 timeout 20 git -C "$1" fetch -q origin "${@:2}" >/dev/null 2>&1; }

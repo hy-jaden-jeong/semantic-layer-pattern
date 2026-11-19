@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: search_metric_monthly
+    description: 상점 내 검색 사용량. 월 × 상점 × 검색 사용자 × 지표(long). 지표 code는 seed search_metric_rules가 정한다.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: metric
+        data_type: varchar
+      - name: metric_label
+        data_type: varchar
+      - name: event_month
+        data_type: varchar
+      - name: store_id
+        data_type: integer
+      - name: user_key
+        data_type: varchar
+      - name: cnt
+        data_type: bigint

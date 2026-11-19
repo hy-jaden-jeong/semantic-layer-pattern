@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 SKILL = Path(__file__).resolve().parents[1]
-SEM = "src/bi/semantic"
+SEM = "semantic"
 NEXT = str(int((SKILL / "VERSION").read_text().strip()) + 1)   # 지금 skill보다 한 단계 새 version
 
 

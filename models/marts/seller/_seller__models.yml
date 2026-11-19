@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: seller_usage_monthly
+    description: 판매자 × 월 × 지표 사용량(long view). 내부·테스트 판매자는 뺐다.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: seller_id
+        data_type: integer
+      - name: event_month
+        data_type: varchar
+      - name: metric_source
+        data_type: varchar
+      - name: metric
+        data_type: varchar
+      - name: value
+        data_type: double
+  - name: seller_health_score
+    description: 판매자 헬스스코어 스냅샷. 기준일 × 판매자(wide).
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: as_of_date
+        data_type: date
+      - name: seller_id
+        data_type: integer
+      - name: score
+        data_type: double
+      - name: tier
+        data_type: bigint
+      - name: order_count_30d
+        data_type: bigint
+      - name: repeat_buyer_rate
+        data_type: double
+  - name: seller_health_score_legacy
+    description: 옛 헬스스코어(월 단위). 지우기 전까지 남겨 둔다.

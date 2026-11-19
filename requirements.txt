@@ -1,3 +1,8 @@
+# semantic layer 검사(tests/semantic). Python 3.10 이상
 pytest>=8,<9
 PyYAML>=6,<7
-metricflow>=0.214,<0.215   # manifest 표준 검사(test 전용, Apache-2.0). Python 3.10 이상
+Jinja2>=3,<4                # catalog.macro_sql이 dbt macro를 dbt 없이 render한다
+metricflow>=0.214,<0.215    # manifest 표준 parser·validator(test 전용, Apache-2.0)
+
+# 예제 dbt project를 돌릴 때만 쓴다(dbt build, eval score). 검사는 dbt 없이 돈다
+dbt-duckdb>=1.8,<2

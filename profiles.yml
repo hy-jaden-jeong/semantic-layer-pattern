@@ -1,0 +1,9 @@
+# 예제용 profile. 계정 없이 돌도록 DuckDB 파일 하나를 쓴다: dbt build --profiles-dir .
+shop_bi:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: shop_bi.duckdb
+      schema: main
+      threads: 1

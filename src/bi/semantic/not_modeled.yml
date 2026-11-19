@@ -1,7 +1,0 @@
-# semantic_model을 두지 않는 gold table과 그 이유. 대시보드가 읽지 않는 중간·옛 table이다.
-# gold에 새 table이 생기면 semantic_model을 두거나 여기에 이유를 적어야 검사를 통과한다.
-not_modeled:
-  - table: gold.seller_health_score_legacy
-    reason: 옛 헬스스코어(월 단위, 주문 수만 본 점수). 대시보드는 seller_health_score를 읽는다.
-  - table: gold.shop_kpi_wide
-    reason: shop_kpi_daily를 일자 × 지표 column으로 펼친 view. 뜻은 shop_kpi_daily 정의를 따른다.

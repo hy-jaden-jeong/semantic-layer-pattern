@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: int_orders
+    description: 주문 한 건에 row 하나. 판매자, KST 일자·월, 첫 주문 여부가 붙어 있다.
+  - name: int_calendar_days
+    description: 하루에 row 하나인 날짜 축.
+  - name: int_search_events
+    description: 지표 code가 붙은 상점 내 검색 로그. code는 seed search_metric_rules가 정한다.
+  - name: int_checkout_session_steps
+    description: 결제 퍼널의 세션 × 단계.
+  - name: int_seller_window_30d
+    description: 기준일 × 판매자의 최근 30일 주문·구매 회원 수.

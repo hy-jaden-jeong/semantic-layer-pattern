@@ -1,17 +1,17 @@
-"""semantic layer 질문 eval(docs/verification.md). 손으로 돌린다(warehouse 인증 필요).
+"""semantic layer 질문 eval(docs/verification.md). 손으로 돌린다.
 
-score는 Databricks SQL warehouse를 쓴다(databricks-sdk를 따로 설치한다). 가상 예제에는 warehouse가 없으니
-자기 warehouse에 gold table을 만든 뒤에 돌리거나, _run_sql만 자기 엔진으로 바꾼다.
-
-  pack  : 임시 폴더에 shop-bi 모양 checkout(src/bi/semantic만)과 skill 사본을 만든다.
+  pack  : 임시 폴더에 정의 저장소 모양 checkout(semantic/만)과 skill 사본을 만든다.
           새 agent가 <out>/shop-bi 안에서 skill을 이름으로 불러, 질문마다
           answers/<id>.sql 과 answers/<id>.yml(답 끝 기준 block)을 쓴다.
-  score : 정답 SQL과 답 SQL을 같은 때 warehouse에서 돌려 결과를 견주고, 기준 block을 id로 견준다.
-          한 run에서 10개 모두 맞아야 통과(종료 코드 0). 보고서를 <answers>/../report.md에 쓴다.
+  score : 정답 SQL과 답 SQL을 같은 DuckDB 파일(dbt build가 만든 것)에서 돌려 결과를 견주고, 기준 block을 id로 견준다.
+          한 run에서 모든 질문이 맞아야 통과(종료 코드 0). 보고서를 <answers>/../report.md에 쓴다.
 
 예:
+  dbt build --profiles-dir .
   python scripts/semantic_eval.py pack --skill-dir skill/shop-data-analytics --out <임시 폴더>
-  python scripts/semantic_eval.py score --answers <임시 폴더>/answers --profile <profile> --warehouse <id> --record
+  python scripts/semantic_eval.py score --answers <임시 폴더>/answers --record
+
+다른 warehouse에서 쓰려면 _connect와 _run_sql 둘만 바꾼다.
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[1]
-QUESTIONS = REPO / "tests" / "bi" / "semantic" / "eval" / "questions.yml"
+QUESTIONS = REPO / "tests" / "semantic" / "eval" / "questions.yml"
 
 
 def _git(cwd, *args):
@@ -38,7 +38,7 @@ def pack(skill_dir: Path, out: Path) -> None:
     if out.exists():
         shutil.rmtree(out)
     seed = out / "seed"
-    shutil.copytree(REPO / "src" / "bi" / "semantic", seed / "src" / "bi" / "semantic",
+    shutil.copytree(REPO / "semantic", seed / "semantic",
                     ignore=shutil.ignore_patterns("*.py", "__pycache__"))
     _git(seed, "init", "-q", "-b", "main")
     _git(seed, "add", "-A")
@@ -61,11 +61,14 @@ def pack(skill_dir: Path, out: Path) -> None:
     print(f"packed {out} (질문 {len(qs)}개). QUESTIONS.md를 새 agent에게 준다.")
 
 
-def _run_sql(w, warehouse: str, sql: str):
-    r = w.statement_execution.execute_statement(warehouse_id=warehouse, statement=sql, wait_timeout="50s")
-    if r.status.state.value != "SUCCEEDED":
-        raise RuntimeError(f"{r.status.state.value}: {r.status.error.message if r.status.error else ''}")
-    return [tuple(row) for row in (r.result.data_array or [])] if r.result else []
+def _connect(db: str):
+    import duckdb
+
+    return duckdb.connect(db, read_only=True)
+
+
+def _run_sql(con, sql: str):
+    return [tuple(row) for row in con.execute(sql).fetchall()]
 
 
 def _norm(v):
@@ -80,10 +83,8 @@ def _same(a, b) -> bool:
     return sorted(tuple(_norm(x) for x in r) for r in a) == sorted(tuple(_norm(x) for x in r) for r in b)
 
 
-def score(answers: Path, profile: str, warehouse: str, record: bool = False) -> int:
-    from databricks.sdk import WorkspaceClient
-
-    w = WorkspaceClient(profile=profile)
+def score(answers: Path, db: str, record: bool = False) -> int:
+    w = _connect(db)
     qs = yaml.safe_load(QUESTIONS.read_text(encoding="utf-8"))["questions"]
     rows, passed = [], 0
     for q in qs:
@@ -106,7 +107,7 @@ def score(answers: Path, profile: str, warehouse: str, record: bool = False) -> 
         answer_sql = sql_path.read_text(encoding="utf-8").strip() if sql_path.exists() else ""
         if q.get("sql"):
             try:
-                ok = answer_sql and _same(_run_sql(w, warehouse, q["sql"]), _run_sql(w, warehouse, answer_sql))
+                ok = answer_sql and _same(_run_sql(w, q["sql"]), _run_sql(w, answer_sql))
                 if not ok:
                     notes.append("결과가 정답 SQL과 다르다")
             except Exception as e:  # noqa: BLE001 - 보고서에 그대로 남긴다
@@ -137,14 +138,13 @@ def main(argv=None) -> int:
     p.add_argument("--out", type=Path, required=True)
     s = sub.add_parser("score")
     s.add_argument("--answers", type=Path, required=True)
-    s.add_argument("--profile", required=True, help="Databricks CLI profile 이름")
-    s.add_argument("--warehouse", required=True, help="SQL warehouse id")
+    s.add_argument("--db", default=str(REPO / "shop_bi.duckdb"), help="dbt build가 만든 DuckDB 파일")
     s.add_argument("--record", action="store_true", help="보고서를 docs/eval-runs/에도 남긴다")
     ns = ap.parse_args(argv)
     if ns.cmd == "pack":
         pack(ns.skill_dir, ns.out)
         return 0
-    return score(ns.answers, ns.profile, ns.warehouse, ns.record)
+    return score(ns.answers, ns.db, ns.record)
 
 
 if __name__ == "__main__":

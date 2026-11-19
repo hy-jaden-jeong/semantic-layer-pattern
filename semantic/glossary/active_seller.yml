@@ -1,0 +1,21 @@
+id: active_seller
+label: 활성 판매자
+synonyms: [활성 입점사, 활성 셀러, active seller]
+question: Q-active-seller
+default: usage
+variants:
+  - id: usage
+    label: 활성 판매자(사용 기준)
+    description: 고른 기간에 주문·검색 같은 사용 기록이 있는 판매자. 고객문의만 있는 판매자는 빠진다.
+    metrics: [su_active_sellers]
+    used_by: [wiki.pipeline-notes]
+  - id: plan
+    label: 활성 판매자(유료 플랜 유효 기준)
+    description: 그날 유효한 유료 입점 플랜 수. 판매자 수가 아니라 플랜 수이고 ENTERPRISE가 빠져 있다.
+    metrics: [seller_plan_active_eod]
+    used_by: [wiki.pricing-plans]
+  - id: listing
+    label: 활성 판매자(판매 중 상품 보유 기준)
+    description: 판매 중인 상품이 1개 이상인 판매자
+    metrics: []
+    not_in_mart: 상품 상태 이력이 warehouse에 적재되지 않는다.

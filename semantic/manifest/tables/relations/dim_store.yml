@@ -1,0 +1,16 @@
+# join 경로만 적는 model이다(measure 없음).
+semantic_model:
+  name: dim_store
+  description: 상점 dimension. 상점 하나에 row 하나다. 판매자 한 곳이 상점을 여럿 열 수 있다.
+  node_relation: {schema_name: mart, alias: dim_store}
+  primary_entity: dim_store_row
+  entities:
+    - {name: store, type: unique, expr: store_id}
+    - {name: seller, type: foreign, expr: seller_id}
+  config:
+    meta:
+      shop:
+        role: relation
+        defined_in: models/marts/core/dim_store.sql
+        relations:
+          - {from: store, to: seller, cardinality: many_to_one}

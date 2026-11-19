@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: dim_store
+    description: 상점 dimension. store_id가 key다.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: store_id
+        data_type: integer
+      - name: seller_id
+        data_type: integer
+      - name: opened_date
+        data_type: date
+  - name: dim_member_seller
+    description: 회원 × 단골 판매자 bridge.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: member_id
+        data_type: integer
+      - name: seller_id
+        data_type: integer
+      - name: user_key
+        data_type: varchar

@@ -1,5 +1,0 @@
-id: Q-tier-direction
-ask: [Sales]
-question: "헬스스코어 Tier는 1이 가장 좋은가, 가장 위험한가?"
-evidence: "wiki.seller-health는 1을 최우수로 적는데 src/aggregation/seller/gold_seller_health_score.sql은 점수 40 미만을 1로 둔다"
-state: open

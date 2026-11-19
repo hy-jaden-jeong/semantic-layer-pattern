@@ -1,0 +1,81 @@
+semantic_model:
+  name: checkout_funnel_daily
+  description: 결제 퍼널. 세션 시작일(KST) × 판매자 × 상점 × 기기 × 단계(wide). 단계에 도달한 세션 수와 그 단계를 다시 요청한 세션 수를 담는다. 주문 건수가 아니라 세션 수다(주문 건수는 shop_kpi_daily의 order_count).
+  node_relation:
+    schema_name: mart
+    alias: checkout_funnel_daily
+  defaults:
+    agg_time_dimension: event_date
+  primary_entity: checkout_funnel_daily_row
+  entities:
+  - name: seller
+    type: foreign
+    expr: seller_id
+  - name: store
+    type: foreign
+    expr: store_id
+  dimensions:
+  - name: event_date
+    type: time
+    description: 세션의 첫 이벤트 KST 일자. 세션이 자정을 넘겨도 시작일에 붙는다.
+    type_params:
+      time_granularity: day
+  - name: device_type
+    type: categorical
+    description: 세션 첫 이벤트의 기기. 합계는 세 값을 모두 더한다.
+    config:
+      meta:
+        shop:
+          values:
+          - APP
+          - MOBILE_WEB
+          - PC_WEB
+  - name: step_no
+    type: categorical
+    description: 단계 순번. 1 장바구니, 2 주문서, 3 결제 수단, 4 결제 완료.
+    config:
+      meta:
+        shop:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+  - name: step_label
+    type: categorical
+    description: 단계 이름. step_no와 1:1이다.
+  measures:
+  - name: checkout_funnel_daily_sessions
+    description: 그 단계에 도달한 세션 수. 세션은 시작일·상점 한 row에만 들어가 날짜·상점끼리는 더해도 되지만, 한 세션이 여러 단계에 잡히므로 step_no끼리는 더하지 않는다.
+    agg: sum
+    expr: sessions
+    config:
+      meta:
+        shop:
+          rollup: sum
+  - name: checkout_funnel_daily_retry_sessions
+    description: 그 단계를 다시 요청한 세션 수. step_no끼리는 더하지 않는다.
+    agg: sum
+    expr: retry_sessions
+    config:
+      meta:
+        shop:
+          rollup: sum
+  config:
+    meta:
+      shop:
+        metric_prefix: 'funnel_'
+        shape: wide
+        grain:
+        - event_date
+        - seller_id
+        - store_id
+        - device_type
+        - step_no
+        defined_in: models/marts/commerce/checkout_funnel_daily.sql
+        rules:
+          kst: applied
+          exclude_internal: caller
+          latest_snapshot: na
+        skip_columns:
+          store_name: 옛 대시보드 호환 column. 이름을 수집하지 않아 늘 NULL이다.

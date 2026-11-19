@@ -1,0 +1,16 @@
+metric:
+  name: search_keyword_search
+  label: 키워드 검색 건수
+  description: 상점 안에서 키워드로 검색한 건수. 상점·검색 사용자 단위이고 내부·테스트 판매자의 상점도 들어 있다. 판매자 단위로 내부 판매자를 빼고 보려면 su_keyword_search를 쓴다.
+  type: simple
+  type_params:
+    measure: search_metric_monthly_cnt
+  filter: "{{ Dimension('search_metric_monthly_row__metric') }} = 'keyword_search'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: confirmed
+        docs:
+        - wiki.pipeline-notes

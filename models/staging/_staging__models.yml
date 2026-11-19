@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_members
+  - name: stg_logins
+  - name: stg_stores
+  - name: stg_orders
+  - name: stg_order_cancels
+  - name: stg_refunds
+  - name: stg_seller_plans
+  - name: stg_checkout_events
+  - name: stg_search_logs
+  - name: stg_cs_tickets
+  - name: stg_seller_follows

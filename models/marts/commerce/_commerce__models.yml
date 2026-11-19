@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: shop_kpi_daily
+    description: 쇼핑몰 일일 운영 KPI. 일자 × 지표(long). 지표의 뜻은 semantic/manifest/metrics/commerce/shop_kpi_daily/에 있다.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: event_date
+        data_type: date
+        description: 지표 일자(KST).
+      - name: category
+        data_type: varchar
+        description: 지표 묶음.
+      - name: metric
+        data_type: varchar
+        description: 지표 code.
+      - name: value
+        data_type: double
+        description: 지표 값.
+  - name: shop_kpi_wide
+    description: shop_kpi_daily를 일자 × 지표 column으로 펼친 view.
+  - name: checkout_funnel_daily
+    description: 결제 퍼널. 세션 시작일 × 판매자 × 상점 × 기기 × 단계(wide).
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: event_date
+        data_type: date
+        description: 세션 시작 일자(KST).
+      - name: seller_id
+        data_type: integer
+        description: 세션이 일어난 상점의 판매자 id.
+      - name: store_id
+        data_type: integer
+        description: 세션이 일어난 상점 id.
+      - name: device_type
+        data_type: varchar
+        description: 세션 첫 이벤트의 기기. APP, MOBILE_WEB, PC_WEB.
+      - name: step_no
+        data_type: integer
+        description: 단계 순번(1 장바구니, 2 주문서, 3 결제 수단, 4 결제 완료).
+      - name: step_label
+        data_type: varchar
+        description: 단계 이름.
+      - name: sessions
+        data_type: bigint
+        description: 그 단계에 도달한 세션 수(세션 중복 제거).
+      - name: retry_sessions
+        data_type: bigint
+        description: 그 단계를 다시 요청한 세션 수.
+      - name: store_name
+        data_type: varchar
+        description: 옛 대시보드 호환 column. 이름을 수집하지 않아 늘 NULL이다.

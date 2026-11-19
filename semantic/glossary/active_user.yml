@@ -1,0 +1,27 @@
+id: active_user
+label: 활성 회원
+synonyms: [active user, 활성 사용자, 액티브 유저, DAU, WAU, MAU]
+question: Q-active-user
+default: login
+variants:
+  - id: login
+    label: 활성 회원(로그인 기준)
+    description: 기간 안에 로그인 기록이 1건 이상인 회원. 전사 DAU·WAU·MAU의 기준이다.
+    metrics: [dau, wau, mau]
+    used_by: [wiki.metric-criteria]
+  - id: purchase
+    label: 활성 회원(구매 기준)
+    description: 그날 주문이 1건 이상인 회원. 로그인만 한 회원은 빠진다.
+    metrics: [buyers]
+    used_by: [wiki.pipeline-notes]
+  - id: search
+    label: 활성 회원(상점 내 검색 기준)
+    description: 고른 기간에 상점 내 검색 기록이 있는 사용자. 사용자 key가 user_key라 로그인 기준과 더하지 않는다.
+    metrics: [search_users]
+    used_by: [wiki.pipeline-notes]
+  - id: app_event
+    label: 활성 회원(앱 이벤트 기준)
+    description: 앱 분석 도구가 식별한 사용자
+    metrics: []
+    not_in_mart: 앱 분석 도구의 수치는 warehouse에 적재되지 않는다. 비로그인 사용자가 섞여 DB 기준보다 크게 나온다.
+    used_by: [wiki.quarterly-report]

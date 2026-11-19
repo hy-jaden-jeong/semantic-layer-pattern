@@ -1,6 +1,6 @@
 # LLM이 들어오는 길
 
-원본에서는 정의와 skill이 두 저장소에 있었다. 정의는 정의 저장소(`shop-bi`)의 `src/bi/semantic/`에, skill은 팀이 함께 쓰는 skill 저장소에 있었다. 이 아카이브는 보기 쉽게 한 repo에 담고 skill을 `skill/shop-data-analytics/`에 둔다. 아래 설계는 두 저장소를 전제로 쓴다. `locate.sh` 첫머리의 `DEFS_REPO`와 `SKILLS_REPO` 두 줄이 두 저장소의 주소이고, 이 아카이브에서는 둘이 같은 값이다.
+원본에서는 정의와 skill이 두 저장소에 있었다. 정의는 정의 저장소(`shop-bi`, dbt project)의 `semantic/`에, skill은 팀이 함께 쓰는 skill 저장소에 있었다. 이 아카이브는 보기 쉽게 한 repo에 담고 skill을 `skill/shop-data-analytics/`에 둔다. 아래 설계는 두 저장소를 전제로 쓴다. `locate.sh` 첫머리의 `DEFS_REPO`와 `SKILLS_REPO` 두 줄이 두 저장소의 주소이고, 이 아카이브에서는 둘이 같은 값이다.
 
 같이 읽을 문서: [design.md](design.md)(형식과 파일 구성), [decisions.md](decisions.md)(결정과 이유), [verification.md](verification.md)(검사와 eval).
 
@@ -11,9 +11,9 @@
 | 내용 | 두는 곳 |
 |---|---|
 | skill `shop-data-analytics`: 질문 → SQL → EDA·차트 → 장표. warehouse에는 SELECT만. `scripts/locate.sh`, `VERSION`, test | skill 저장소(아카이브: `skill/shop-data-analytics/`) |
-| 정의 쓰기: 근거 찾기 차례, 형식 version 올리는 차례, 검증. 정의 쓰기용 dev skill은 두지 않는다 | 정의 저장소 `src/bi/semantic/README.md`의 "정의 쓰기" |
+| 정의 쓰기: 근거 찾기 차례, 형식 version 올리는 차례, 검증. 정의 쓰기용 dev skill은 두지 않는다 | 정의 저장소 `semantic/README.md`의 "정의 쓰기" |
 | 언제 쓰는지, 실행 모델, 최신 강제, 실패하면 멈춤, 어디서나 지킬 것(정의 밖 추측 금지, PII, 답에 ref) | SKILL.md |
-| 읽는 순서, MetricFlow 칸과 `meta.shop`의 뜻, SQL 규칙, 답 끝 기준 block, 정의 쓰는 법 | 정의 저장소 `src/bi/semantic/README.md`. YAML 형식과 같은 변경에서 고친다 |
+| 읽는 순서, MetricFlow 칸과 `meta.shop`의 뜻, SQL 규칙, 답 끝 기준 block, 정의 쓰는 법 | 정의 저장소 `semantic/README.md`. YAML 형식과 같은 변경에서 고친다 |
 
 skill에는 지표의 뜻을 한 줄도 적지 않는다. skill이 하는 일은 정의 폴더를 최신 main으로 찾아 그곳 README의 "질문에 답하기"를 따르게 하는 것, 그리고 분석 대화를 이어 가는 것뿐이다.
 
@@ -21,7 +21,7 @@ skill에는 지표의 뜻을 한 줄도 적지 않는다. skill이 하는 일은
 
 skill이 정의 저장소에 기대는 것은 셋뿐이다. 정의 저장소의 test가 셋을 검사한다([verification.md](verification.md)).
 
-1. 경로: 정의 폴더는 `src/bi/semantic/`이다.
+1. 경로: 정의 폴더는 저장소 root의 `semantic/`이다(`semantic/settings.py`의 `SEM_DIR`, `locate.sh`의 `SEM`).
 2. README 절 이름 둘: "질문에 답하기", "정의 쓰기". skill은 이 이름으로 절을 찾는다.
 3. index.md 첫 두 줄: `format: 1`과 `skill_min: 1`. `format`은 정의 형식 version이고, `skill_min`은 이 정의를 읽을 수 있는 가장 낮은 skill `VERSION`이다.
 
@@ -33,8 +33,8 @@ skill이 정의 저장소에 기대는 것은 셋뿐이다. 정의 저장소의 
 
 ### 답할 때는 항상 origin/main
 
-- 작업 디렉터리가 정의 저장소 checkout이어도 working tree가 아니라 origin/main을 쓴다. fetch한 뒤 `git archive origin/main src/bi/semantic`으로 꺼낸다(`source=main ref=main@<sha> via=checkout`).
-- checkout 밖이면 `git ls-remote`로 main의 sha를 보고, 받아 둔 cache와 같으면 다시 쓴다(`via=cache-current`). 다르면 git sparse clone(`--depth 1 --filter=blob:none --sparse`)으로 `src/bi/semantic`만 받는다(`via=clone`).
+- 작업 디렉터리가 정의 저장소 checkout이어도 working tree가 아니라 origin/main을 쓴다. fetch한 뒤 `git archive origin/main semantic`으로 꺼낸다(`source=main ref=main@<sha> via=checkout`).
+- checkout 밖이면 `git ls-remote`로 main의 sha를 보고, 받아 둔 cache와 같으면 다시 쓴다(`via=cache-current`). 다르면 git sparse clone(`--depth 1 --filter=blob:none --sparse`)으로 `semantic/`만 받는다(`via=clone`). dbt project의 나머지(models, seeds)는 받지 않는다.
 - cache는 sha마다 폴더를 따로 둔다. 실행마다 고유한 임시 폴더에 받은 뒤 rename으로 들이고, 현재 sha를 적는 파일도 임시 파일을 rename해 바꾼다. 동시에 돌아도 이미 알려 준 경로가 사라지지 않게, 옛 sha 폴더는 하루 넘게 안 쓴 것만 치운다.
 - 정의를 고칠 때만 로컬 working tree를 쓴다. 그때는 skill이 아니라 README "정의 쓰기"를 따른다.
 - 한 대화에서는 처음 찾은 정의 폴더와 ref를 끝까지 쓴다. turn마다 정의가 다르면 앞 답과 견줄 수 없다. 날이 바뀌었거나 사용자가 정의를 고쳤다고 하면 다시 실행하고, ref가 달라졌으면 답에 적는다.
@@ -49,7 +49,7 @@ skill이 정의 저장소에 기대는 것은 셋뿐이다. 정의 저장소의 
 ### 확인 실패 때 동작
 
 - 네트워크나 권한 때문에 최신인지 확인하지 못하면 로컬의 가장 최근 정의(checkout의 origin/main 또는 받아 둔 cache)로 답한다. stderr에 `freshness=unknown last_checked=<시각>`이 나오고, 답의 주의 줄에 "최신 확인 못 한 정의(마지막 확인 <시각>)"를 적는다. 멈추기만 하면 VPN 밖이나 오프라인에서 쓸 수 없다.
-- 가진 정의가 없으면 멈춘다. agent는 stderr의 `error=` 줄을 사용자에게 그대로 전하고, 기억이나 gold SQL을 직접 읽어 지어낸 정의로 답하지 않는다.
+- 가진 정의가 없으면 멈춘다. agent는 stderr의 `error=` 줄을 사용자에게 그대로 전하고, 기억이나 mart model SQL을 직접 읽어 지어낸 정의로 답하지 않는다.
 
 | 종료 코드 | 뜻 |
 |---|---|

@@ -1,0 +1,16 @@
+metric:
+  name: su_keyword_search
+  label: 판매자 월 키워드 검색 건수
+  description: 그달(KST) 그 판매자의 상점들 안에서 일어난 키워드 검색 건수. code는 search_metric_monthly의 keyword_search를 그대로 쓴다. 내부·테스트 판매자는 빠져 있다. 상점 단위나 전체 검색 건수는 search_keyword_search를 쓴다.
+  type: simple
+  type_params:
+    measure: seller_usage_monthly_value
+  filter: "{{ Dimension('seller_usage_monthly_row__metric') }} = 'keyword_search'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: confirmed
+        docs:
+        - wiki.pipeline-notes
