@@ -1,0 +1,18 @@
+# join 경로만 적는 model이다(measure 없음).
+semantic_model:
+  name: dim_member_seller
+  description: 회원 × 단골 판매자 bridge. 회원 한 명이 판매자 여럿을 단골로 둘 수 있다.
+  node_relation: {database: "`dev-shop-bi-catalog`", schema_name: silver, alias: dim_member_seller}
+  primary_entity: dim_member_seller_row
+  entities:
+    - {name: member, type: foreign, expr: member_id}
+    - {name: seller, type: foreign, expr: seller_id}
+    - {name: search_user, type: foreign, expr: user_key}
+  config:
+    meta:
+      shop:
+        role: relation
+        defined_in: src/warehouse/silver_dim_member_seller.sql
+        relations:
+          - {from: member, to: seller, cardinality: many_to_many}
+          - {from: search_user, to: seller, cardinality: many_to_many}

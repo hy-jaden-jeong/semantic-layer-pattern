@@ -1,0 +1,14 @@
+metric:
+  name: funnel_retry_sessions
+  label: 단계 재시도 세션 수
+  description: 그 결제 단계를 다시 요청한 세션 수. step_no로 단계를 고른다.
+  type: simple
+  type_params:
+    measure: checkout_funnel_daily_retry_sessions
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 세션
+        status: code_only
+        docs: []

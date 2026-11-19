@@ -1,0 +1,22 @@
+# entity = 세는 단위. 관계는 manifest/tables/relations/의 semantic_model에 적는다(적는 곳은 하나).
+entities:
+  - id: member
+    label: 회원(구매자)
+    keys: [member_id]
+    synonyms: [회원, 구매자, 사용자, 계정]
+    description: 회원 수는 member_id로 센다. 로그인·주문 fact의 join key다.
+  - id: seller
+    label: 판매자(분석 단위)
+    keys: [seller_id]
+    synonyms: [판매자, 입점사, 셀러]
+    description: 판매자 수는 seller_id로 센다. 판매자 한 곳이 상점을 여럿 열 수 있다.
+  - id: store
+    label: 상점(화면 식별자)
+    keys: [store_id]
+    synonyms: [상점, 스토어, 미니샵]
+    description: 화면에는 store_id를 보이고 판매자 단위 집계는 seller_id로 한다.
+  - id: search_user
+    label: 사용자(검색 로그 기준)
+    keys: [user_key]
+    synonyms: [검색 사용자]
+    description: user_key = hash(로그인 id). 검색 로그 계열(search_metric_monthly)의 사용자 key다. member_id와 섞지 않는다.

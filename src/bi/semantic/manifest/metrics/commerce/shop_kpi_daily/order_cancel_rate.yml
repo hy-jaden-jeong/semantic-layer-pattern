@@ -1,0 +1,17 @@
+metric:
+  name: order_cancel_rate
+  label: 주문 취소율
+  description: order_cancel_count ÷ order_count. 기간을 물으면 분자와 분모를 기간으로 각각 더한 뒤 나눈다. 날짜별 비율을 평균하지 않는다. 분자는 취소일, 분모는 주문일 기준이라 같은 주문을 견준 값이 아니다.
+  type: ratio
+  type_params:
+    numerator:
+      name: order_cancel_count
+    denominator:
+      name: order_count
+  config:
+    meta:
+      shop:
+        kind: ratio
+        status: code_only
+        docs: []
+        synonyms: [취소율, 취소률]

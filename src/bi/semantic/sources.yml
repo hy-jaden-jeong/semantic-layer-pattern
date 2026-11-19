@@ -1,0 +1,10 @@
+# 정의 원본(문서) 등록부. 코드 원본은 model의 meta.shop.defined_in이 가리킨다.
+# grade: A 정본(owner가 쓴 확정 문서, 코드와 맞음) / B 쓸 만함 / C 참고만 / D 쓰지 않음(인용하면 검사 실패).
+# owner에는 팀·역할만 적는다. 사람 이름은 적지 않는다.
+# ref는 사내 wiki page의 slug다(가상).
+sources:
+  - {id: wiki.metric-criteria, label: 주요 지표 집계 기준, kind: wiki, ref: data/metric-criteria, owner: 데이터팀(리드), grade: A, checked_on: 2026-11-18, use: "DAU·WAU·MAU(rolling), 가입, 주문 수·금액"}
+  - {id: wiki.seller-health, label: 판매자 헬스스코어 산출 기준, kind: wiki, ref: sales/seller-health, owner: 영업팀(CX), grade: A, checked_on: 2026-11-18, use: "점수 식, Tier 규칙, 재구매 회원 비율의 업무 정의"}
+  - {id: wiki.pricing-plans, label: 입점 플랜 개편, kind: wiki, ref: product/pricing-plans, owner: Product(PO), grade: A, checked_on: 2026-11-18, use: "현행 플랜 체계(BASIC·PLUS·ENTERPRISE), 유료 플랜의 정의"}
+  - {id: wiki.pipeline-notes, label: BI pipeline 상세, kind: wiki, ref: data/pipeline-notes, owner: 데이터팀(리드), grade: B, checked_on: 2026-11-18, use: "mart별 grain, KST·내부 판매자 제외 결정, 검색 로그 분류 규칙. 배치 시각 일부가 낡음"}
+  - {id: wiki.quarterly-report, label: 분기 통계 리포트, kind: wiki, ref: product/quarterly-report, owner: Product(리드), grade: C, checked_on: 2026-11-18, use: "활성 회원을 앱 이벤트 기준으로 셈. DB 기준과 값이 다르다"}

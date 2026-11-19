@@ -1,0 +1,5 @@
+id: Q-active-user
+ask: [Product]
+question: "전사 활성 회원의 공식 기준은 로그인인가, 구매인가, 앱 이벤트인가?"
+evidence: "wiki.metric-criteria는 로그인, wiki.quarterly-report는 앱 이벤트로 센다"
+state: open

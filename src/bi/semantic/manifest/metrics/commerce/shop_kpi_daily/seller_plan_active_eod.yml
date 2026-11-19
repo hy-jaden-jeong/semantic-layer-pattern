@@ -1,0 +1,19 @@
+metric:
+  name: seller_plan_active_eod
+  label: 유효 유료 입점 플랜 수(일말)
+  description: 그날 기준 시작했고 끝나지 않은 BASIC·PLUS 입점 플랜 수. ENTERPRISE는 들어 있지 않다.
+  type: simple
+  type_params:
+    measure: shop_kpi_daily_value_eod
+  filter: "{{ Dimension('shop_kpi_daily_row__metric') }} = 'seller_plan_active_eod'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 플랜
+        status: conflict
+        docs:
+        - wiki.pricing-plans
+        questions:
+        - Q-active-seller
+        - Q-plan-scope

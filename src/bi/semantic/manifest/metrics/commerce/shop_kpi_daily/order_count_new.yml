@@ -1,0 +1,15 @@
+metric:
+  name: order_count_new
+  label: 첫 주문 수
+  description: 그날(KST) 주문 중 그 회원의 첫 주문인 건수.
+  type: simple
+  type_params:
+    measure: shop_kpi_daily_value
+  filter: "{{ Dimension('shop_kpi_daily_row__metric') }} = 'order_count_new'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: code_only
+        docs: []

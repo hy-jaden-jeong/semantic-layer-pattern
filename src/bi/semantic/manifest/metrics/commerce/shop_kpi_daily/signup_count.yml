@@ -1,0 +1,16 @@
+metric:
+  name: signup_count
+  label: 가입 수
+  description: 그날(KST) 가입한 회원 수.
+  type: simple
+  type_params:
+    measure: shop_kpi_daily_value
+  filter: "{{ Dimension('shop_kpi_daily_row__metric') }} = 'signup_count'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: confirmed
+        docs:
+        - wiki.metric-criteria

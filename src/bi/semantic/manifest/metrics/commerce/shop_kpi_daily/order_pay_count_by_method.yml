@@ -1,0 +1,15 @@
+metric:
+  name: order_pay_count_by_method
+  label: 결제 수단별 주문 수
+  description: 결제 수단 code별 주문 건수. 결제 수단이 늘면 code도 늘어난다. 수단별로 보려면 metric dimension으로 묶는다.
+  type: simple
+  type_params:
+    measure: shop_kpi_daily_value
+  filter: "{{ Dimension('shop_kpi_daily_row__metric') }} LIKE 'order_pay_%_count'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: code_only
+        docs: []

@@ -1,0 +1,16 @@
+metric:
+  name: search_category_browse
+  label: 카테고리 탐색 건수
+  description: 상점 안에서 카테고리 목록을 연 건수.
+  type: simple
+  type_params:
+    measure: search_metric_monthly_cnt
+  filter: "{{ Dimension('search_metric_monthly_row__metric') }} = 'category_browse'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: confirmed
+        docs:
+        - wiki.pipeline-notes

@@ -1,0 +1,5 @@
+id: Q-active-seller
+ask: [Sales, Product]
+question: "활성 판매자는 사용 기록이 있는 판매자인가, 유료 플랜이 유효한 판매자인가?"
+evidence: "대시보드는 사용 기준(seller_usage_monthly), 영업 보고는 플랜 기준으로 센다"
+state: open

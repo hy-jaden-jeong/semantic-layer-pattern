@@ -1,0 +1,5 @@
+id: Q-repeat-rate-denominator
+ask: [Sales]
+question: "재구매 회원 비율의 분모는 최근 30일 구매 회원 수인가, 누적 구매 회원 수인가?"
+evidence: "wiki.seller-health는 누적, src/aggregation/seller/gold_seller_health_score.sql은 최근 30일을 쓴다"
+state: open

@@ -1,0 +1,78 @@
+semantic_model:
+  name: seller_health_score
+  description: 판매자 헬스스코어 스냅샷. 기준일 × 판매자(wide). 기준일마다 쌓이므로 질의할 때 as_of_date 하나를 고른다(기본은 MAX). 내부·테스트 판매자는 table을 만들 때 뺐다.
+  node_relation:
+    database: '`dev-shop-bi-catalog`'
+    schema_name: gold
+    alias: seller_health_score
+  defaults:
+    agg_time_dimension: as_of_date
+  primary_entity: seller_health_score_row
+  entities:
+  - name: seller
+    type: foreign
+    expr: seller_id
+  dimensions:
+  - name: as_of_date
+    type: time
+    description: 스냅샷 기준일(KST). 최근 30일 창의 끝 날이다.
+    type_params:
+      time_granularity: day
+  measures:
+  - name: seller_health_score_score
+    description: 판매자 한 곳의 점수(0~100). 판매자·기준일을 넘어 더하지 않는다.
+    agg: sum
+    expr: score
+    non_additive_dimension:
+      name: as_of_date
+      window_choice: max
+    config:
+      meta:
+        shop:
+          rollup: none
+  - name: seller_health_score_tier
+    description: 판매자 한 곳의 등급(1~3). 더하지 않고, 등급별 판매자 수를 센다.
+    agg: sum
+    expr: tier
+    non_additive_dimension:
+      name: as_of_date
+      window_choice: max
+    config:
+      meta:
+        shop:
+          rollup: none
+  - name: seller_health_score_order_count_30d
+    description: 기준일까지 최근 30일 주문 수. 판매자끼리는 더해도 되지만 기준일끼리는 창이 겹쳐 더하지 않는다. 기간을 물으면 마지막 기준일 값을 쓴다.
+    agg: sum
+    expr: order_count_30d
+    non_additive_dimension:
+      name: as_of_date
+      window_choice: max
+    config:
+      meta:
+        shop:
+          rollup: last
+  - name: seller_health_score_repeat_buyer_rate
+    description: 판매자 한 곳의 재구매 회원 비율(0~1). 더하거나 평균하지 않는다.
+    agg: sum
+    expr: repeat_buyer_rate
+    non_additive_dimension:
+      name: as_of_date
+      window_choice: max
+    config:
+      meta:
+        shop:
+          rollup: none
+  config:
+    meta:
+      shop:
+        metric_prefix: 'hs_'
+        shape: wide
+        grain:
+        - as_of_date
+        - seller_id
+        defined_in: src/aggregation/seller/gold_seller_health_score.sql
+        rules:
+          kst: applied
+          exclude_internal: applied
+          latest_snapshot: caller

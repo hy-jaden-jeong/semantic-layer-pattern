@@ -1,0 +1,17 @@
+metric:
+  name: search_users
+  label: 검색 사용자 수
+  description: 고른 기간·지표 안에서 검색 기록이 있는 사용자 수. 질의할 때 센다. 사용자 key가 user_key라 로그인 기준 회원 수와 더하지 않는다.
+  type: simple
+  type_params:
+    measure: search_metric_monthly_users
+  config:
+    meta:
+      shop:
+        kind: distinct_count
+        counts: search_user
+        unit: 사용자
+        status: query_time
+        docs: []
+        questions:
+        - Q-active-user

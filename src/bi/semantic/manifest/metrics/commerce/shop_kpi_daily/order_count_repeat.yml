@@ -1,0 +1,15 @@
+metric:
+  name: order_count_repeat
+  label: 재주문 수
+  description: 그날(KST) 주문 중 첫 주문이 아닌 건수.
+  type: simple
+  type_params:
+    measure: shop_kpi_daily_value
+  filter: "{{ Dimension('shop_kpi_daily_row__metric') }} = 'order_count_repeat'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: code_only
+        docs: []

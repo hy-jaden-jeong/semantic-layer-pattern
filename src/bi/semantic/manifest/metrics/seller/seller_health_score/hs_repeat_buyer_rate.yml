@@ -1,0 +1,17 @@
+metric:
+  name: hs_repeat_buyer_rate
+  label: 재구매 회원 비율
+  description: 최근 30일 구매 회원 중 그 판매자에게서 두 번 이상 산 회원의 비율(0~1). 코드의 분모는 최근 30일 구매 회원 수다.
+  type: simple
+  type_params:
+    measure: seller_health_score_repeat_buyer_rate
+  config:
+    meta:
+      shop:
+        kind: ratio
+        status: conflict
+        docs:
+        - wiki.seller-health
+        questions:
+        - Q-repeat-rate-denominator
+        synonyms: [재구매율, 재구매률]

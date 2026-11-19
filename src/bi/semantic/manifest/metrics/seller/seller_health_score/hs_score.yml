@@ -1,0 +1,15 @@
+metric:
+  name: hs_score
+  label: 헬스스코어 점수
+  description: 기준일의 판매자 점수(0~100). 최근 30일 주문 수와 재구매 회원 비율로 계산한다.
+  type: simple
+  type_params:
+    measure: seller_health_score_score
+  config:
+    meta:
+      shop:
+        kind: score
+        unit: 점
+        status: confirmed
+        docs:
+        - wiki.seller-health

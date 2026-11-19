@@ -1,0 +1,4 @@
+# MetricFlow semantic manifest의 project 설정. parser가 문서 하나를 요구한다.
+# metricflow로 SQL을 만들지 않으므로 time spine table을 두지 않는다.
+project_configuration:
+  time_spine_table_configurations: []

@@ -1,0 +1,15 @@
+metric:
+  name: su_order_count
+  label: 판매자 월 주문 수
+  description: 그달(KST) 그 판매자에게 들어온 주문 건수.
+  type: simple
+  type_params:
+    measure: seller_usage_monthly_value
+  filter: "{{ Dimension('seller_usage_monthly_row__metric') }} = 'order_count'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: code_only
+        docs: []

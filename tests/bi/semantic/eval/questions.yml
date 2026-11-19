@@ -1,0 +1,54 @@
+# semantic layer 질문 eval. scripts/semantic_eval.py가 읽는다.
+# sql은 정답 SQL(정의를 따라 손으로 쓴 것). 거절 문항은 sql이 없다. 가상 예제라 값은 확인하지 않았다.
+# expect는 답 끝 기준 block과 견줄 것: metrics(집합 일치), variant(일치), questions·rules_applied_by_me·other_variants(포함).
+# 기준 block 파일이 없으면 실패다.
+questions:
+  - id: q01-stored
+    type: 저장 지표 그대로
+    question: 2026년 11월 17일 DAU는 몇 명인가?
+    sql: SELECT value FROM `dev-shop-bi-catalog`.gold.shop_kpi_daily WHERE metric = 'dau' AND event_date = DATE'2026-11-17'
+    expect: {metrics: [dau], variant: active_user.login}
+  - id: q02-period-sum
+    type: 기간 합
+    question: 2026년 11월 1일부터 16일까지 주문 수 합계는?
+    sql: SELECT SUM(value) FROM `dev-shop-bi-catalog`.gold.shop_kpi_daily WHERE metric = 'order_count' AND event_date BETWEEN DATE'2026-11-01' AND DATE'2026-11-16'
+    expect: {metrics: [order_count]}
+  - id: q03-rolling-month
+    type: rolling 지표의 월 값
+    question: 2026년 10월 MAU는?
+    sql: SELECT value FROM `dev-shop-bi-catalog`.gold.shop_kpi_daily WHERE metric = 'mau' AND event_date = DATE'2026-10-31'
+    expect: {metrics: [mau], variant: active_user.login}
+  - id: q04-non-additive
+    type: 더하면 안 되는 지표
+    question: 2026년 10월 하루 평균 DAU는?
+    sql: SELECT AVG(value) FROM `dev-shop-bi-catalog`.gold.shop_kpi_daily WHERE metric = 'dau' AND event_date BETWEEN DATE'2026-10-01' AND DATE'2026-10-31'
+    expect: {metrics: [dau], variant: active_user.login}
+  - id: q05-snapshot-conflict
+    type: 일말 스냅샷, 열린 질문
+    question: 2026년 11월 15일 기준 유효 유료 입점 플랜 수는?
+    sql: SELECT value FROM `dev-shop-bi-catalog`.gold.shop_kpi_daily WHERE metric = 'seller_plan_active_eod' AND event_date = DATE'2026-11-15'
+    expect: {metrics: [seller_plan_active_eod], questions: [Q-plan-scope]}
+  - id: q06-ambiguous-term
+    type: 뜻이 여럿인 용어(기본 variant)
+    question: 2026년 10월 활성 판매자 수는?
+    sql: SELECT COUNT(DISTINCT CASE WHEN value > 0 THEN seller_id END) FROM `dev-shop-bi-catalog`.gold.seller_usage_monthly WHERE event_month = '2026-10' AND metric_source <> 'cs'
+    expect: {metrics: [su_active_sellers], variant: active_seller.usage, questions: [Q-active-seller], other_variants: [active_seller.plan]}
+  - id: q07-latest-snapshot-tier
+    type: 최신 스냅샷과 Tier 방향
+    question: 최신 헬스스코어에서 가장 위험한 등급에 있는 판매자는 몇 곳인가?
+    sql: SELECT COUNT(DISTINCT h.seller_id) FROM `dev-shop-bi-catalog`.gold.seller_health_score h WHERE h.as_of_date = (SELECT MAX(as_of_date) FROM `dev-shop-bi-catalog`.gold.seller_health_score) AND h.tier = 1
+    expect: {metrics: [hs_tier], questions: [Q-tier-direction], rules_applied_by_me: [latest_snapshot]}
+  - id: q08-ratio
+    type: 비율 지표와 열린 질문
+    question: 최신 기준일에 재구매 회원 비율이 30% 미만인 판매자는 몇 곳인가?
+    sql: SELECT COUNT(DISTINCT h.seller_id) FROM `dev-shop-bi-catalog`.gold.seller_health_score h WHERE h.as_of_date = (SELECT MAX(as_of_date) FROM `dev-shop-bi-catalog`.gold.seller_health_score) AND h.repeat_buyer_rate < 0.3
+    expect: {metrics: [hs_repeat_buyer_rate], questions: [Q-repeat-rate-denominator], rules_applied_by_me: [latest_snapshot]}
+  - id: q09-not-in-gold
+    type: gold에 없는 지표(거절)
+    question: 지난달 MRR은 얼마인가?
+    expect: {metrics: []}
+  - id: q10-seed-code
+    type: seed가 정한 검색 지표
+    question: 2026년 10월 상점 내 키워드 검색 건수 합계는?
+    sql: SELECT SUM(cnt) FROM `dev-shop-bi-catalog`.gold.search_metric_monthly WHERE metric = 'keyword_search' AND event_month = '2026-10'
+    expect: {metrics: [search_keyword_search]}

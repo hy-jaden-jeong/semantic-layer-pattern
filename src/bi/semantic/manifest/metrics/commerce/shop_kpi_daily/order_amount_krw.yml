@@ -1,0 +1,16 @@
+metric:
+  name: order_amount_krw
+  label: 주문 금액
+  description: 그날(KST) 들어온 주문의 결제 금액 합계(원). 환불을 빼지 않는다.
+  type: simple
+  type_params:
+    measure: shop_kpi_daily_value
+  filter: "{{ Dimension('shop_kpi_daily_row__metric') }} = 'order_amount_krw'"
+  config:
+    meta:
+      shop:
+        kind: amount
+        unit: 원
+        status: confirmed
+        docs:
+        - wiki.metric-criteria

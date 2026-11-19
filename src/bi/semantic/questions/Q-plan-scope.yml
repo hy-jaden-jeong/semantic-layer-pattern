@@ -1,0 +1,5 @@
+id: Q-plan-scope
+ask: [Product]
+question: "유효 유료 플랜 수에 ENTERPRISE를 넣는가?"
+evidence: "wiki.pricing-plans는 유료 플랜을 BASIC·PLUS·ENTERPRISE로 적는데 src/aggregation/commerce/gold_shop_kpi_daily.sql은 BASIC·PLUS만 센다"
+state: open

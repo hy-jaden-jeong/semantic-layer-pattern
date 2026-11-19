@@ -1,0 +1,14 @@
+metric:
+  name: hs_order_count_30d
+  label: 최근 30일 주문 수
+  description: 기준일까지 최근 30일(KST) 그 판매자에게 들어온 주문 건수.
+  type: simple
+  type_params:
+    measure: seller_health_score_order_count_30d
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: code_only
+        docs: []

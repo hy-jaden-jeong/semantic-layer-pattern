@@ -1,0 +1,16 @@
+# 모든 model이 지키거나, 질의하는 쪽이 걸어야 하는 공통 규칙.
+# model은 meta.shop.rules에 여기 있는 rule마다 applied | caller | not_applied | na 를 적는다.
+#   applied: table이 이미 걸어 두었다 / caller: 질의하는 쪽이 걸어야 한다 / not_applied: 걸 수 없다(답에 밝힌다) / na: 관계없음
+catalog: "`dev-shop-bi-catalog`"
+rules:
+  - id: kst
+    label: 날짜는 KST(Asia/Seoul)
+    how: gold의 event_date·event_month·as_of_date는 이미 KST다. 다시 변환하지 않는다.
+  - id: exclude_internal
+    label: 내부·테스트 판매자 제외
+    how: model이 caller면 아래 조건을 WHERE에 붙인다. {id}에 seller_id column 참조식을 넣는다. NOT IN은 seller_id가 NULL인 row도 뺀다(NULL NOT IN은 참이 아니다).
+    sql:
+      seller: "{id} NOT IN (SELECT seller_id FROM `dev-shop-bi-catalog`.ref.internal_seller_id)"
+  - id: latest_snapshot
+    label: 스냅샷 table은 기준일을 하나 고른다
+    how: as_of_date가 쌓이는 table은 as_of_date = (SELECT MAX(as_of_date) ...) 또는 질문의 기준일 하나로 거른다.

@@ -1,0 +1,18 @@
+metric:
+  name: su_active_sellers
+  label: 사용 기록이 있는 판매자 수
+  description: 고른 기간·metric 안에서 값이 0보다 큰 사용 기록이 있는 판매자 수. 질의할 때 센다. 고객문의(cs)는 사용이 아니라서 뺀다.
+  type: simple
+  type_params:
+    measure: seller_usage_monthly_active_sellers
+  filter: "{{ Dimension('seller_usage_monthly_row__metric_source') }} != 'cs'"
+  config:
+    meta:
+      shop:
+        kind: distinct_count
+        counts: seller
+        unit: 판매자
+        status: query_time
+        docs: []
+        questions:
+        - Q-active-seller

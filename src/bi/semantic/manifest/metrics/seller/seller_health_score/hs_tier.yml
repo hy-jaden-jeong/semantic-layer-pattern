@@ -1,0 +1,16 @@
+metric:
+  name: hs_tier
+  label: 헬스스코어 Tier
+  description: 기준일의 판매자 등급. 코드에서는 1이 가장 위험하다(점수 40 미만 1, 70 미만 2, 그 이상 3).
+  type: simple
+  type_params:
+    measure: seller_health_score_tier
+  config:
+    meta:
+      shop:
+        kind: grade
+        status: conflict
+        docs:
+        - wiki.seller-health
+        questions:
+        - Q-tier-direction

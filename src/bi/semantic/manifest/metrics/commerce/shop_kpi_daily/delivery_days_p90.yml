@@ -1,0 +1,15 @@
+metric:
+  name: delivery_days_p90
+  label: 배송 소요 일수 p90
+  description: 그날(KST) 배송이 끝난 주문의 주문일 → 배송 완료일 일수의 90 백분위.
+  type: simple
+  type_params:
+    measure: shop_kpi_daily_value_stat
+  filter: "{{ Dimension('shop_kpi_daily_row__metric') }} = 'delivery_days_p90'"
+  config:
+    meta:
+      shop:
+        kind: percentile
+        unit: 일
+        status: code_only
+        docs: []

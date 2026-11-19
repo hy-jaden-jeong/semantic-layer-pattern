@@ -1,0 +1,16 @@
+metric:
+  name: search_filter_search
+  label: 필터 검색 건수
+  description: 상점 안에서 필터를 걸어 검색한 건수.
+  type: simple
+  type_params:
+    measure: search_metric_monthly_cnt
+  filter: "{{ Dimension('search_metric_monthly_row__metric') }} = 'filter_search'"
+  config:
+    meta:
+      shop:
+        kind: count
+        unit: 건
+        status: confirmed
+        docs:
+        - wiki.pipeline-notes
