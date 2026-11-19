@@ -3,6 +3,7 @@
 회사 업무에서 설계한 semantic layer를, dbt project의 mart layer 위에 얹는다고 가정하고 가상 도메인으로 다시 썼다. 가상 도메인은 오픈마켓이다. 판매자(seller)가 상점(store)을 열고 회원(member)이 구매한다. 정의를 담는 저장소 이름은 `shop-bi`(가상)이고, 이 repo가 그 저장소 모양을 그대로 따른다. repo root가 dbt project(`shop_bi`)이고, 예제는 DuckDB(dbt-duckdb)에서 실제로 돈다.
 
 같이 읽을 문서
+- [operating-model.md](operating-model.md): 개발·운영·관리, 쿼리 빌더와 다른 점, 실제 적용 규모
 - [decisions.md](decisions.md): 결정과 이유, 버린 후보, 치르는 값
 - [llm-entry.md](llm-entry.md): LLM이 들어오는 길, 두 저장소 약속, 최신 강제, 답의 모양
 - [verification.md](verification.md): 검사, 망가뜨려 보는 test, 질문 eval, 검증에서 잡힌 구멍
