@@ -2,7 +2,7 @@
 
 LLM이 SQL을 짓고 EDA까지 할 수 있게 여는 semantic layer와 그 운영 방식이다. dbt project의 mart layer 위에 얹는다.
 
-실제 업무에서 이 방식으로 semantic layer를 만들고(metric 약 340개), data analytics skill로 분석에 쓰고, 정의를 관리했다. 회사 정의와 data는 옮기지 않았고, 같은 구조를 가상 쇼핑몰 dbt project(`shop-bi`)에 세워 템플릿으로 남긴다. 참조 구현은 DuckDB에서 처음부터 끝까지 돌고, MIT license라 그대로 가져다 쓸 수 있다.
+업무에서 semantic layer를 만들고, data analytics skill로 운영하고, 정의를 관리하던 구조를 다른 dbt project에 옮겨 쓸 수 있게 템플릿으로 정리했다. 정의와 data는 가상 쇼핑몰 dbt project(`shop-bi`)의 참조 구현이고, DuckDB에서 처음부터 끝까지 돈다. MIT license다.
 
 ![정의는 고정하고, query는 LLM이 skill로 짓는다](docs/img/vs-metricflow.png)
 
@@ -31,20 +31,7 @@ semantic layer의 보통 쓰임은 쿼리 빌더다. MetricFlow 같은 도구는
 | 운영 | 분석하는 사람 누구나 | skill에 묻고, SQL·표·장표를 보고, 다음 분석을 고른다 | skill이 늘 최신 main의 정의를 받는다. 답에는 확정되지 않은 정의가 주의 한 줄로 붙는다 |
 | 관리 | 지표 owner·관리자 | 열린 질문에 답하고, 원본 등급을 고치고, eval을 돌린다 | owner 확인 목록, 원본 등급 A~D, eval 기록 |
 
-세 단계를 어떻게 돌렸는지, 실제 적용 규모와 운영하며 바꾼 것은 [docs/operating-model.md](docs/operating-model.md)에 있다.
-
-## 실제 적용에서
-
-| | 첫 merge | 이틀 운영한 뒤 |
-|---|---|---|
-| table 정의 + 관계 | 18 + 2 | 18 + 2 |
-| metric | 302 | 340 |
-| confirmed · code_only · conflict · query_time | 135 · 91 · 75 · 1 | 177 · 94 · 66 · 3 |
-| owner 질문 | 10 | 11 |
-
-- 정의를 처음 모았을 때 metric 넷 중 하나는 문서와 코드가 달랐다. 정본을 고르지 않고 owner 질문 10개로 모았다.
-- 정의를 대시보드 집계에 맞춰 가며 conflict가 줄고 confirmed가 늘었다.
-- 질문 eval은 첫 run 9/10, README를 고친 뒤 10/10이었다. skill 이름을 말하지 않고 표현을 바꾼 질문 21번에서 모두 skill이 켜졌다.
+세 단계를 어떻게 돌리는지와 운영하며 정한 규칙은 [docs/operating-model.md](docs/operating-model.md)에 있다.
 
 ## 설계의 핵심
 

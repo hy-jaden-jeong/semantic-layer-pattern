@@ -1,6 +1,6 @@
 # 결정과 이유
 
-[design.md](design.md)의 모양을 왜 그렇게 정했는지 적는다. 결정은 주제별 절로 묶었다. "원본 번호"는 회사 설계 문서의 결정 번호이고, 여러 번호를 하나로 합친 줄도 있다. "정한 쪽"의 설계자는 이 설계를 맡은 사람, agent는 함께 설계한 LLM agent다. 같이 읽을 문서: [llm-entry.md](llm-entry.md), [verification.md](verification.md).
+[design.md](design.md)의 모양을 왜 그렇게 정했는지 적는다. 결정은 주제별 절로 묶었다. "원본 번호"는 원래 설계 문서의 결정 번호이고, 여러 번호를 하나로 합친 줄도 있다. "정한 쪽"의 설계자는 이 설계를 맡은 사람, agent는 함께 설계한 LLM agent다. 같이 읽을 문서: [llm-entry.md](llm-entry.md), [verification.md](verification.md).
 
 ## 범위와 소비자
 
@@ -28,7 +28,7 @@
 |---|---|---|---|---|
 | D10 | 정의 위치 | `semantic/` 한 곳. dbt의 model-paths 밖 | agent | semantic layer는 dbt pipeline의 한 단계가 아니라 mart 위에 얹는 정의다. dbt는 model-paths 안의 YAML을 모두 property 파일로 읽는다. 정의 파일을 models/ 안에 넣어 `dbt parse`를 돌려 보니 오류도 경고도 없이 넘어갔다(dbt 1.12). 조용히 무시되는 파일이 dbt 파일 사이에 섞이면, 사람은 dbt가 그 정의를 쓴다고 오해한다. 정의는 dbt project YAML이 아니다(D30). 도메인마다 흩으면 진입점이 여럿이 된다 |
 | D47·D48 | 나누는 이유 | 풀 문제는 넷: LLM의 읽기 비용, 사람의 찾기·diff·충돌, dbt 프로젝트와 같은 배치, 옆 파일의 크기 | 설계자 | 파일 하나에 모두 두면 지표 하나를 물어도 전부 읽고, 지표 하나를 더해도 큰 파일에 충돌이 난다 |
-| D51·D54·D55 | 나누는 단위 | table 정의 파일에 semantic_model 하나, metric 파일 `<metric>.yml`에 metric 하나. 어기면 실패 | 설계자(검사는 agent) | 실제 적용 때 dau를 물으면 table 정의 약 90줄과 dau 약 17줄만 읽었다. 주제별 파일(약 740줄)이나 table별 metric 파일(약 1,250줄)은 읽기 비용이 남는다 |
+| D51·D54·D55 | 나누는 단위 | table 정의 파일에 semantic_model 하나, metric 파일 `<metric>.yml`에 metric 하나. 어기면 실패 | 설계자(검사는 agent) | dau를 물으면 table 정의 하나와 dau 파일 하나만 읽는다. 주제별 파일이나 table별 metric 파일은 metric이 늘수록 길어져 읽기 비용이 남는다 |
 | D59·D63 | 폴더 | `manifest/tables/`와 `manifest/metrics/` 두 tree. 사람·LLM에게는 "table 정의"라 부른다 | 설계자 | dbt처럼 두 tree로 둔다. `semantic_models`라는 폴더 이름은 도구가 만든 낱말이라 읽는 사람에게 낯설다 |
 | D61 | metric 폴더와 table | metric의 measure가 그 폴더 이름의 table에 있어야 한다 | agent | 폴더로 table을 짐작해도 틀리지 않게 한다 |
 | D52·D56 | 옆 파일 | glossary·questions는 항목마다 `<id>.yml`, 나머지 넷(entities, rules, sources, not_modeled)은 한 파일 | 설계자(이름 규칙은 agent) | 용어·질문은 항목마다 길고 따로 바뀐다. 나머지까지 모두 나누면 한 줄짜리 파일이 수십 개 생긴다 |
@@ -50,7 +50,7 @@
 | D15·D58 | 정의 없는 새 mart 지표 | 무조건 실패(우회 표기 없음). 메시지가 만들 파일 경로와 붙여 넣을 최소 metric 문서를 보여 준다. 정의나 mart model을 고친 사람이 merge 전에 `make ci-local`로 돌린다. pre-push hook은 켜지 않는다 | 설계자(메시지는 agent) | 우회 표기를 허락하면 빠진 지표가 쌓인다. 대가는 mart model을 쓰는 사람이 매번 정의를 쓰는 것이다. 모든 push를 막는 hook은 과하다 |
 | D24 | data가 만드는 code | family 정의 하나로 덮는다. 새 prefix는 실패, 아는 prefix 안의 새 code는 통과 | 설계자 | 오프라인에서는 data가 만들 code를 알 수 없다. D15의 유일한 예외다 |
 | D29 | staging·intermediate를 거치는 관계 검사 | 하지 않는다 | agent | 관계 table(`dim_store`, `dim_member_seller`)도 mart model이다. 생기면 다시 정한다 |
-| D72 | ci-local의 semantic test | 실제 정의 검사는 늘 돈다. 정의를 망가뜨려 보는 test(약 60초)는 semantic 경로가 main 대비 바뀐 branch에서만 돈다. 전부는 `make test` | agent | 약 60초가 `make ci-local`마다 붙으면 사람이 검사를 건너뛴다. mart model이나 `macros/exclude_internal.sql`만 바뀐 변경도 실제 정의 검사가 D15를 잡는다 |
+| D72 | ci-local의 semantic test | 실제 정의 검사는 늘 돈다. 정의를 망가뜨려 보는 test(느리다)는 semantic 경로가 main 대비 바뀐 branch에서만 돈다. 전부는 `make test` | agent | 느린 test가 `make ci-local`마다 붙으면 사람이 검사를 건너뛴다. mart model이나 `macros/exclude_internal.sql`만 바뀐 변경도 실제 정의 검사가 D15를 잡는다 |
 
 ## LLM 진입과 skill
 
@@ -79,7 +79,7 @@
 
 | 원본 번호 | 무엇을 | 답 | 정한 쪽 | 이유 |
 |---|---|---|---|---|
-| D21·D66 | 지식 graph | semantic layer + 명시적 관계(entity 관계, metric → entity·원본·용어 edge). `render.graph()`가 만들고 test가 본다. graph JSON은 commit하지 않고 `render --graph`로 필요할 때 만든다 | 설계자 | 범용 nodes/edges 저장소나 RDF/OWL은 과하다. graph JSON은 변경 diff의 절반 가까이를 차지했는데 읽는 곳은 test와 시각화뿐이었다 |
+| D21·D66 | 지식 graph | semantic layer + 명시적 관계(entity 관계, metric → entity·원본·용어 edge). `render.graph()`가 만들고 test가 본다. graph JSON은 commit하지 않고 `render --graph`로 필요할 때 만든다 | 설계자 | 범용 nodes/edges 저장소나 RDF/OWL은 과하다. graph JSON은 변경 diff를 크게 부풀리는데 읽는 곳은 test와 시각화뿐이다 |
 | D57·D67 | index.md | table마다 "읽을 파일" 한 줄(table 정의 경로 + metric 경로 규칙, metric이 없으면 "(metric 없음)"), 끝에 owner 확인 목록. 지표 사전·graph 문서는 따로 두지 않는다 | agent(D67은 설계자) | metric마다 경로를 적으면 metric 수만큼 줄이 늘어 읽기 비용이 커진다. 지표 사전은 index.md와 내용이 같았다 |
 
 ## 버린 후보

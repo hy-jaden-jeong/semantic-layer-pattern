@@ -1,6 +1,6 @@
 # 개발·운영·관리
 
-이 repo는 실제 업무에서 semantic layer를 만들고, data analytics skill로 운영하고, 정의를 관리한 방식을 템플릿으로 남긴 것이다. 원래 정의와 data는 회사 것이라 옮기지 않았고, 같은 구조를 가상 쇼핑몰 dbt project(`shop-bi`)에 다시 세웠다. 이 문서는 그 방식을 사람과 일의 흐름으로 적는다. 형식은 [design.md](design.md), 결정과 이유는 [decisions.md](decisions.md), LLM이 들어오는 길은 [llm-entry.md](llm-entry.md), 검사는 [verification.md](verification.md)에 있다.
+semantic layer를 만들고, data analytics skill로 운영하고, 정의를 관리하는 방식이다. 예시는 가상 쇼핑몰 dbt project(`shop-bi`)로 든다. 이 문서는 그 방식을 사람과 일의 흐름으로 적는다. 형식은 [design.md](design.md), 결정과 이유는 [decisions.md](decisions.md), LLM이 들어오는 길은 [llm-entry.md](llm-entry.md), 검사는 [verification.md](verification.md)에 있다.
 
 ![답하다 찾은 모호함이 정의로 돌아가 정의가 단단해진다](img/operating-loop.png)
 
@@ -81,28 +81,11 @@ skill은 돌 때마다 정의 저장소의 최신 main을 받는다. 작업 중�
 - **형식 version**: 정의 형식을 바꿔 옛 skill이 못 읽게 되면 skill `VERSION`을 먼저 올리고 정의의 `skill_min`을 그다음에 올린다. 순서가 바뀌면 모든 사람의 skill이 멈춘다(D40).
 - **eval**: 정의나 README를 크게 바꾸면 질문 eval을 돌린다. 모든 run을 남기고, 통과해도 답한 agent가 "답을 정하기 어려웠던 곳"을 함께 본다.
 
-## 실제 적용에서
-
-회사 data warehouse의 mart 위에 같은 방식으로 세웠다. 숫자는 집계만 적는다.
-
-| | 첫 merge | 이틀 운영한 뒤 |
-|---|---|---|
-| table 정의 + 관계 | 18 + 2 | 18 + 2 |
-| metric | 302 | 340 |
-| status confirmed · code_only · conflict · query_time | 135 · 91 · 75 · 1 | 177 · 94 · 66 · 3 |
-| 뜻이 여럿인 용어 | 4 | 6 |
-| owner 질문 | 10 | 11 |
-| 원본 문서(A~D) · 정의하지 않은 mart table | 10 · 14 | 10 · 14 |
-
-- 처음 정의를 모았을 때 metric 넷 중 하나가 문서와 코드가 달랐다(conflict 75개). 같은 이름이 네 가지 뜻으로 쓰인 "활성 사용자"가 대표다. 이 conflict를 정본을 고르지 않고 owner 질문 10개로 모은 것이 첫 결과였다.
-- 질문 eval은 첫 run 9/10이었다. 틀린 문항은 정의가 아니라 SQL이 묻지 않은 column까지 select한 것이었고, README에 규칙 한 줄을 더한 뒤 10/10이 됐다. merge 뒤 skill로 다시 돌려 10/10이었다.
-- skill 이름을 말하지 않고 표현을 바꾼 질문 21번에서 21번 모두 skill이 켜졌다.
-
 ## 운영하며 바꾼 것
 
-처음 설계가 끝이 아니었다. 실제로 쓰면서 정의와 README를 여러 번 고쳤고, 고칠 때마다 이 템플릿에 규칙으로 남겼다.
+처음 설계가 끝이 아니었다. 쓰면서 정의와 README를 여러 번 고쳤고, 고칠 때마다 이 템플릿에 규칙으로 남겼다.
 
-- **정의를 대시보드 숫자에 맞췄다.** 정의대로 셌는데 대시보드와 숫자가 다르면 사람은 정의를 믿지 않는다. 대시보드가 실제로 거는 filter(내부 계정, 범위 제외)를 정의에 옮기고, 근거 찾기 차례에 대시보드 SQL을 넣었다. 그 과정에서 conflict가 줄고 confirmed가 늘었다.
+- **정의를 대시보드 숫자에 맞췄다.** 정의대로 셌는데 대시보드와 숫자가 다르면 사람은 정의를 믿지 않는다. 대시보드가 실제로 거는 filter(내부 계정, 범위 제외)를 정의에 옮기고, 근거 찾기 차례에 대시보드 SQL을 넣었다.
 - **"row가 없는 날"을 정했다.** long table은 값이 0인 날의 row가 없다. 그날을 "0"으로 볼지 "값 없음"으로 볼지 정하지 않으면 LLM이 질문마다 다르게 답한다. "table의 마지막 날짜 안이면 0, 원천이 끊긴 기간은 caveats에 적고 측정 안 됨"으로 정했다.
 - **함께 보인 column도 지표로 셌다.** 점수 순위를 보이며 Tier를 함께 내면 그 Tier도 쓴 지표다. 그 status와 주의도 답에 붙여야 한다.
 - **원천 경로가 바뀐 기간을 적었다.** 로그 수집 경로가 바뀐 달은 값이 0처럼 보인다. metric의 caveats에 측정 안 된 기간을 적어 "0건"과 "측정 안 됨"을 가르게 했다.

@@ -69,7 +69,7 @@ metricflow 0.214.x의 parser와 validator가 `manifest/`를 읽는다. 모르는
 |---|---|---|
 | `dbt build --profiles-dir .`, mart model을 고친 뒤 | seed·model build와 contract 검사 | dbt가 mart model의 SQL이 model yml contract(column 이름·type)와 맞는지 강제한다. 검사는 contract를 읽으므로 build가 통과해야 검사가 믿는 column이 맞다 |
 | `make ci-local`, 늘 | 표준 validator + 실제 정의 검사(`test_repo_definitions.py`) | mart model이나 `macros/exclude_internal.sql`만 바뀐 변경에서도 빠짐 검사가 돌아야 한다 |
-| `make ci-local`, semantic 경로(`semantic`, `tests/semantic`, `requirements.txt`)가 main 대비 바뀐 branch | 위 + 망가뜨려 보는 test(실제 적용에서 약 60초, 이 예제는 약 10초) | 검사 코드가 그대로면 같은 결과다. 약 60초가 매번 붙으면 사람이 검사를 건너뛴다 |
+| `make ci-local`, semantic 경로(`semantic`, `tests/semantic`, `requirements.txt`)가 main 대비 바뀐 branch | 위 + 망가뜨려 보는 test(정의가 많을수록 느리다) | 검사 코드가 그대로면 같은 결과다. 느린 test가 매번 붙으면 사람이 검사를 건너뛴다 |
 | `make test` | 전부 | |
 | 손으로, 정의나 skill을 크게 바꾼 뒤 | 질문 eval | LLM이 답을 쓰는 단계가 있어 오프라인 검사에 넣을 수 없다. score 자체는 DuckDB에서 계정 없이 돈다 |
 
@@ -92,7 +92,7 @@ metricflow 0.214.x의 parser와 validator가 `manifest/`를 읽는다. 모르는
 | block 파일 | 없으면 실패 |
 | SQL | 거절해야 하는데 SQL을 지으면 실패 |
 
-한 run에서 모든 질문이 맞아야 통과다. 원본 설계 때 질문은 10개였고 기준은 10/10이었다. 모든 run을 보고서로 남긴다. 한 번 통과한 run만 남기면 정답률이 부풀어 보인다. 이 예제에서는 `dbt build`가 통과하고(node 38개), 정답 SQL 9개가 DuckDB에서 값을 낸다(q09는 거절 문항이라 정답 SQL이 없다). run 기록은 `--record`로 `docs/eval-runs/`에 남는다. 이 예제로 두 번 돌렸다. [run 1](eval-runs/2026-11-19T070111Z.md)과 [run 2](eval-runs/2026-11-19T070340Z.md) 모두 10/10이다. run 1에서 답한 agent가 짚은 README의 빈틈 셋을 고친 뒤 run 2를 돌렸다(아래 "eval은 통과해도 README의 빈틈을 알려 준다").
+한 run에서 모든 질문이 맞아야 통과다. 모든 run을 보고서로 남긴다. 한 번 통과한 run만 남기면 정답률이 부풀어 보인다. 이 예제에서는 `dbt build`가 통과하고(node 38개), 정답 SQL 9개가 DuckDB에서 값을 낸다(q09는 거절 문항이라 정답 SQL이 없다). run 기록은 `--record`로 `docs/eval-runs/`에 남는다. 이 예제로 두 번 돌렸다. [run 1](eval-runs/2026-11-19T070111Z.md)과 [run 2](eval-runs/2026-11-19T070340Z.md) 모두 10/10이다. run 1에서 답한 agent가 짚은 README의 빈틈 셋을 고친 뒤 run 2를 돌렸다(아래 "eval은 통과해도 README의 빈틈을 알려 준다").
 
 ## 동작 표
 
@@ -149,7 +149,7 @@ eval score가 처음에는 block 파일이 없거나 `other_variants`가 빠진 
 
 ### eval 실패가 정의가 아니라 README의 빈틈일 수 있다
 
-첫 eval run은 9/10이었다. 틀린 문항은 정의가 아니라 답 SQL이 묻지 않은 column을 더 select해 결과 표가 달라진 것이었다. README에 "SQL은 질문이 묻는 값만 select한다"를 더했고 다음 run은 10/10이었다.
+eval에서 틀린 문항이 정의 탓이 아닐 때가 있었다. 답 SQL이 묻지 않은 column을 더 select해 결과 표가 달라진 것이었다. README에 "SQL은 질문이 묻는 값만 select한다"를 더해 막았다.
 
 ### 파일을 나누면 경로를 만드는 곳이 하나여야 한다
 
